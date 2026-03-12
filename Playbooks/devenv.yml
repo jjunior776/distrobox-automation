@@ -1,0 +1,43 @@
+---
+- name: Setup IntelliJ IDEA Community Edition
+  hosts: localhost
+  connection: local
+  vars:
+    # This URL redirected to the latest .tar.gz
+    intellij_url: "https://download.jetbrains.com/product?code=IIC&latest&distribution=linux"
+    install_dir: "/opt/intellij-idea"
+    bin_link: "/usr/local/bin/idea"
+
+  tasks:
+    - name: Ensure installation directory exists
+      become: true
+      ansible.builtin.file:
+        path: "{{ install_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Download and extract IntelliJ IDEA
+      become: true
+      ansible.builtin.unarchive:
+        src: "{{ intellij_url }}"
+        dest: "{{ install_dir }}"
+        remote_src: true
+        extra_opts: [--strip-components=1]
+        creates: "{{ install_dir }}/bin/idea.sh"
+
+    - name: Create a symlink to the executable
+      become: true
+      ansible.builtin.file:
+        src: "{{ install_dir }}/bin/idea.sh"
+        dest: "{{ bin_link }}"
+        state: link
+
+    - name: Ensure dependencies are present (Example for Fedora/RedHat)
+      become: true
+      ansible.builtin.package:
+        name:
+          - libXrender
+          - libXtst
+          - fontconfig
+        state: present
+      when: ansible_os_family == "RedHat"
