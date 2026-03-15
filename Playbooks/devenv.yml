@@ -42,14 +42,34 @@
         state: present
       when: ansible_os_family == "RedHat"
 
-    - name: Install Homebrew (if not already installed)
-      become: true
-      ansible.builtin.package:
-        name: homebrew
+    - name: Ensure dependencies are installed
+      ansible.builtin.dnf:
+        name:
+          - curl
+          - git
         state: present
 
-    - name: Install OpenCode using Homebrew
-      become: true
-      community.general.homebrew:
-        name: opencode
-        state: present
+    - name: Download and execute OpenCode installation script
+      ansible.builtin.shell:
+        cmd: |
+          curl -fsSL https://opencode.ai/install | bash
+        creates: /usr/local/bin/opencode
+        warn: false
+
+    - name: Ensure OpenCode bin is in PATH
+      ansible.builtin.lineinfile:
+        path: ~/.bashrc
+        line: 'export PATH="$HOME/.opencode/bin:$PATH"'
+        create: true
+        mode: '0644'
+
+    - name: Configure OpenCode for local Qwen
+      ansible.builtin.copy:
+        dest: "~/.config/opencode/opencode.json"
+        content: |
+          {
+            "provider": "ollama",
+            "model": "qwen2.5-coder:14b",
+            "apiBase": "http://localhost:11434"
+          }
+        mode: '0644'  # Set appropriate file permissions
