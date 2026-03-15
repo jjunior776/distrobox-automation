@@ -2,6 +2,7 @@
 - name: Setup IntelliJ IDEA Community Edition
   hosts: localhost
   connection: local
+  become: true
   vars:
     # This URL redirected to the latest .tar.gz
     intellij_url: "https://download.jetbrains.com/product?code=IIC&latest&distribution=linux"
@@ -54,7 +55,9 @@
         cmd: |
           curl -fsSL https://opencode.ai/install | bash
         creates: /usr/local/bin/opencode
-        warn: false
+      register: install_result
+      failed_when: install_result.rc != 0
+      changed_when: install_result.rc == 0
 
     - name: Ensure OpenCode bin is in PATH
       ansible.builtin.lineinfile:
