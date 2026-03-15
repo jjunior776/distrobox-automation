@@ -47,7 +47,6 @@
       ansible.builtin.package:
         name: homebrew
         state: present
-        provider: flatpak
 
     - name: Install OpenCode using Homebrew
       become: true
