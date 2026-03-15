@@ -51,6 +51,6 @@
 
     - name: Install OpenCode using Homebrew
       become: true
-      ansible.builtin.brew:
+      community.general.homebrew:
         name: opencode
         state: present
