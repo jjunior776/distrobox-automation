@@ -43,12 +43,14 @@
       when: ansible_os_family == "RedHat"
 
     - name: Install Homebrew (if not already installed)
+      become: true
       ansible.builtin.package:
         name: homebrew
         state: present
         provider: flatpak
 
     - name: Install OpenCode using Homebrew
-      community.general.homebrew:
+      become: true
+      ansible.builtin.brew:
         name: opencode
         state: present
