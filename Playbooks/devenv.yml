@@ -41,3 +41,14 @@
           - fontconfig
         state: present
       when: ansible_os_family == "RedHat"
+
+    - name: Install Homebrew (if not already installed)
+      ansible.builtin.package:
+        name: homebrew
+        state: present
+        provider: flatpak
+
+    - name: Install OpenCode using Homebrew
+      community.general.homebrew:
+        name: opencode
+        state: present
